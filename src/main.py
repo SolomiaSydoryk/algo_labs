@@ -6,7 +6,7 @@ class BinaryTree:
         self.parent = parent
 
 
-def find_successor(tree: BinaryTree, node: BinaryTree) -> BinaryTree:
+def find_successor(node: BinaryTree) -> BinaryTree:
     if node.right:
         successor = node.right
         while successor.left:

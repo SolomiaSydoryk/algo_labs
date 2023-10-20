@@ -12,7 +12,7 @@ class TestFind(unittest.TestCase):
         root.left.right = BinaryTree(7, parent=root.left)
         root.right.right = BinaryTree(20, parent=root.right)
         root.right.right.left = BinaryTree(15, parent=root.right.right)
-        successor_node = find_successor(root, root.left.right)
+        successor_node = find_successor(root.left.right)
 
         self.assertEqual(successor_node.value, 10)
 
