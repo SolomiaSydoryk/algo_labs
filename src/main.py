@@ -1,3 +1,6 @@
+from collections import deque
+
+
 class Node:
     def __init__(self, key):
         self.value = key
@@ -8,13 +11,19 @@ class Node:
 def min_depth(root):
     if root is None:
         return 0
-    if root.left is None and root.right is None:
-        return 1
-    if root.left is None:
-        return min_depth(root.right) + 1
-    if root.right is None:
-        return min_depth(root.left) + 1
-    return min(min_depth(root.left), min_depth(root.right)) + 1
+
+    queue = deque([(root, 1)])
+
+    while queue:
+        node, depth = queue.popleft()
+
+        if node.left is None and node.right is None:
+            return depth
+
+        if node.left:
+            queue.append((node.left, depth + 1))
+        if node.right:
+            queue.append((node.right, depth + 1))
 
 
 def build_tree(edges):
@@ -44,4 +53,3 @@ if __name__ == "__main__":
 
     with open('../output.txt', 'w') as output_file:
         output_file.write(str(result))
-
