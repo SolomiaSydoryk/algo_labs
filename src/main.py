@@ -1,64 +1,28 @@
-class Graph:
-    def __init__(self, vertices):
-        self.V = vertices
-        self.graph = [[0 for _ in range(vertices)] for _ in range(vertices)]
+def rabin_karp(haystack: str, needle: str, base: int = 256, divisor: int = 101):
+    if not needle or not haystack:
+        return []
 
-    def min_distance(self, dist, visited):
-        index = 0
-        dist_min = float('inf')
-        for v in range(self.V):
-            if dist[v] < dist_min and visited[v] is False:
-                dist_min = dist[v]
-                index = v
-        return index
+    pattern_mask = 0  # числове представлення needle
+    first_letter_power = pow(base, len(needle) - 1, divisor)
+    haystack_substring_mask = 0
 
-    def dijkstra(self, first_node):
-        dist = [float('inf')] * self.V
-        dist[first_node] = 0
-        visited = [False] * self.V
+    # перетворюємо шаблон в число
+    for char in needle:
+        pattern_mask = (base * pattern_mask + ord(char)) % divisor
 
-        for _ in range(self.V):
-            u = self.min_distance(dist, visited)
-            visited[u] = True
+    index = []
 
-            for v in range(self.V):
-                if (
-                        self.graph[u][v] > 0
-                        and visited[v] is False
-                        and dist[v] > dist[u] + self.graph[u][v]
-                ):
-                    dist[v] = dist[u] + self.graph[u][v]
+    # перетворюємо першу підстроку в число
+    for i in range(len(needle)):
+        haystack_substring_mask = (base * haystack_substring_mask + ord(haystack[i])) % divisor
 
-        return dist
+    for i in range(len(haystack) - len(needle) + 1):
+        if pattern_mask == haystack_substring_mask and haystack[i:i + len(needle)] == needle:
+            index.append(i)
 
-    def find_optimal_server_location(self, client_nodes):
-        min_max_latency = float('inf')
+        if i < len(haystack) - len(needle):
+            haystack_substring_mask = (base * (haystack_substring_mask - ord(haystack[i]) * first_letter_power) +
+                                       ord(haystack[i + len(needle)])) % divisor
 
-        for potential_server in range(self.V):
-            current_graph = [row[:] for row in self.graph]
+    return index
 
-            for client in client_nodes:
-                current_graph[client - 1][potential_server] = 0
-                current_graph[potential_server][client - 1] = 0
-
-            current_dist = self.dijkstra(potential_server)
-
-            max_latency = max(current_dist)
-            if max_latency < min_max_latency:
-                min_max_latency = max_latency
-
-        return min_max_latency
-
-
-with open("../gamsrv.in", "r") as infile:
-    N, M = map(int, infile.readline().split())
-    client_nodes = list(map(int, infile.readline().split()))
-    g = Graph(N)
-    for _ in range(M):
-        start, end, latency = map(int, infile.readline().split())
-        g.graph[start - 1][end - 1] = latency
-        g.graph[end - 1][start - 1] = latency
-
-with open("../gamsrv.out", "w") as outfile:
-    result = g.find_optimal_server_location(client_nodes)
-    outfile.write(str(result))

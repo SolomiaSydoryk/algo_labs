@@ -1,49 +1,45 @@
 import unittest
-from src.main import Graph
+
+from src.main import rabin_karp
 
 
-class TestMinMaxLatency(unittest.TestCase):
-    def test_first(self):
-        graph = Graph(6)
-        graph.graph = [
-            [0, 0, 10, 0, 0, 0],
-            [0, 0, 40, 100, 0, 0],
-            [10, 40, 0, 80, 0, 0],
-            [0, 100, 80, 0, 50, 0],
-            [0, 0, 0, 50, 0, 20],
-            [0, 0, 0, 0, 20, 0]
-        ]
-        client_nodes = [1, 2, 6]
-        result = graph.find_optimal_server_location(client_nodes)
-        self.assertEqual(result, 100)
+class TestRabinKarp(unittest.TestCase):
 
-    def test_second(self):
-        graph = Graph(9)
-        graph.graph = [
-            [0, 20, 0, 20, 0, 0, 0, 0, 0],
-            [20, 0, 20, 0, 10, 0, 0, 0, 0],
-            [0, 20, 0, 0, 0, 20, 0, 0, 0],
-            [20, 0, 0, 0, 10, 0, 20, 0, 0],
-            [0, 10, 0, 10, 0, 10, 10, 10, 10],
-            [0, 0, 20, 0, 10, 0, 0, 20, 0],
-            [0, 0, 0, 20, 10, 0, 0, 20, 0],
-            [0, 0, 0, 0, 10, 20, 20, 0, 20],
-            [0, 0, 0, 0, 10, 0, 0, 20, 0]
-        ]
-        client_nodes = [2, 4, 6]
-        result = graph.find_optimal_server_location(client_nodes)
-        self.assertEqual(result, 20)
+    def test_single_occurrence(self):
+        haystack = "kkkkabckkkk"
+        needle = "abc"
+        result = rabin_karp(haystack, needle)
+        self.assertEqual(result, [4])
 
-    def test_third(self):
-        graph = Graph(3)
-        graph.graph = [
-            [0, 50, 1000000000],
-            [50, 0, 1000000000],
-            [1000000000, 1000000000, 0]
-        ]
-        client_nodes = [1, 3]
-        result = graph.find_optimal_server_location(client_nodes)
-        self.assertEqual(result, 1000000000)
+    def test_multiple_occurrences(self):
+        haystack = "abcabcabc"
+        needle = "abc"
+        result = rabin_karp(haystack, needle)
+        self.assertEqual(result, [0, 3, 6])
+
+    def test_no_occurrence(self):
+        haystack = "abcdefg"
+        needle = "io"
+        result = rabin_karp(haystack, needle)
+        self.assertEqual(result, [])
+
+    def test_empty_needle(self):
+        haystack = "abc"
+        needle = ""
+        result = rabin_karp(haystack, needle)
+        self.assertEqual(result, [])
+
+    def test_empty_haystack(self):
+        haystack = ""
+        needle = "abc"
+        result = rabin_karp(haystack, needle)
+        self.assertEqual(result, [])
+
+    def test_both_empty(self):
+        haystack = ""
+        needle = ""
+        result = rabin_karp(haystack, needle)
+        self.assertEqual(result, [])
 
 
 if __name__ == '__main__':
